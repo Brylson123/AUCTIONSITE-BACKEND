@@ -5,5 +5,4 @@ export interface OfferInterface {
   price: number;
 }
 
-
 export type AddOfferResponse = OfferInterface;
