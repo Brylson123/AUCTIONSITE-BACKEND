@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { OfferInterface } from '../../interfaces/offer';
+import { AddOfferResponse, OfferInterface } from '../../interfaces/offer';
 import { Offers } from './offers.entity';
 import { AddOfferDto } from './dto/dto';
+
+import { Like } from 'typeorm';
+import * as path from 'path';
+import { storageDir } from '../utils/storage';
+import { MulterDiskUploadedFiles } from '../interfaces/files';
+import fs from 'fs';
 
 @Injectable()
 export class OffersService {
@@ -10,19 +16,67 @@ export class OffersService {
     return { id, price, description, name };
   }
 
-  async getoOffers(): Promise<OfferInterface[]> {
-    return (await Offers.find()).map(this.filter);
+  async getOffers(name: string): Promise<AddOfferResponse[]> {
+    if (!name) {
+      return (await Offers.find()).map(this.filter);
+    }
+
+    return (await Offers.findBy({ name: Like(`%${name}%`) })).map(this.filter);
   }
 
-  async add(newOffer: AddOfferDto) {
-    const offer = new Offers();
-    offer.id = newOffer.id;
-    offer.price = newOffer.price;
-    offer.description = newOffer.description;
-    offer.name = newOffer.name;
+  async getOne(id: string): Promise<Offers> {
+    return await Offers.findOneBy({ id });
+  }
 
-    await offer.save();
+  async add(
+    req: AddOfferDto,
+    files: MulterDiskUploadedFiles,
+  ): Promise<OfferInterface> {
+    const photo = files?.photo?.[0] ?? null;
 
-    return this.filter(offer);
+    console.log(photo);
+
+    try {
+      const offer = new Offers();
+      offer.price = req.price;
+      offer.description = req.description;
+      offer.name = req.name;
+
+      if (photo) {
+        offer.photoFn = photo.filename;
+      }
+
+      await offer.save();
+
+      return this.filter(offer);
+    } catch (e) {
+      try {
+        if (photo) {
+          console.log(storageDir(), 'product-photos', photo.filename);
+          fs.unlinkSync(
+            path.join(storageDir(), 'product-photos', photo.filename),
+          );
+        }
+      } catch (e2) {}
+
+      throw e;
+    }
+  }
+
+  async getPhoto(id: string, res: any) {
+    try {
+      const one = await Offers.findOneBy({ id });
+      if (!one) {
+        throw new Error('no object found');
+      }
+      if (!one.photoFn) {
+        throw new Error('No photo in this entity!');
+      }
+      res.sendFile(one.photoFn, {
+        root: path.join(storageDir(), 'product-photos'),
+      });
+    } catch (e) {
+      throw e;
+    }
   }
 }

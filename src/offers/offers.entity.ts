@@ -25,7 +25,7 @@ export class Offers extends BaseEntity implements OfferInterface {
 
   @Column({
     default: null,
-    nullable: null,
+    nullable: true,
   })
   photoFn: string;
 }
