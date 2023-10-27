@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { AddOfferResponse, OfferInterface } from '../../interfaces/offer';
+import { AddOfferResponse, OfferInterface } from '../interfaces/offer';
 import { Offers } from './offers.entity';
 import { AddOfferDto } from './dto/dto';
-
 import { Like } from 'typeorm';
 import * as path from 'path';
 import { storageDir } from '../utils/storage';
 import { MulterDiskUploadedFiles } from '../interfaces/files';
 import fs from 'fs';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class OffersService {
@@ -31,6 +31,7 @@ export class OffersService {
   async add(
     req: AddOfferDto,
     files: MulterDiskUploadedFiles,
+    user: User,
   ): Promise<OfferInterface> {
     const photo = files?.photo?.[0] ?? null;
 
@@ -41,6 +42,7 @@ export class OffersService {
       offer.price = req.price;
       offer.description = req.description;
       offer.name = req.name;
+      offer.user = user;
 
       if (photo) {
         offer.photoFn = photo.filename;
