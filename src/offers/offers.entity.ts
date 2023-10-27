@@ -1,5 +1,13 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { OfferInterface } from '../../interfaces/offer';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { OfferInterface } from '../interfaces/offer';
+import { User } from '../user/user.entity';
 
 @Entity()
 export class Offers extends BaseEntity implements OfferInterface {
@@ -28,4 +36,8 @@ export class Offers extends BaseEntity implements OfferInterface {
     nullable: true,
   })
   photoFn: string;
+
+  @ManyToOne((type) => User, (entity) => entity.UserOffers)
+  @JoinColumn()
+  user: User;
 }
