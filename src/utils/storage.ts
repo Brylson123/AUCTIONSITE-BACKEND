@@ -2,7 +2,7 @@ import * as path from 'path';
 import { diskStorage } from 'multer';
 
 export function storageDir() {
-  return path.join(__dirname, '../../../storage');
+  return path.join(__dirname, '../../storage');
 }
 
 export function multerStorage(dest: string) {
