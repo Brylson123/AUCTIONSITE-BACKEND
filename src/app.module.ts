@@ -3,7 +3,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OffersModule } from './offers/offers.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { config } from 'utils/config/config.db';
+import { config } from 'src/utils/config/config.db';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { UserController } from './user/user.controller';
+import { OffersController } from './offers/offers.controller';
+import { OffersService } from './offers/offers.service';
+import { UserService } from './user/user.service';
 
 @Module({
   imports: [
@@ -20,8 +26,10 @@ import { config } from 'utils/config/config.db';
       synchronize: true,
     }),
     OffersModule,
+    UserModule,
+    AuthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, UserController, OffersController],
+  providers: [AppService, UserService, OffersService],
 })
 export class AppModule {}
