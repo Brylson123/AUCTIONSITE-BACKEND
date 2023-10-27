@@ -7,16 +7,20 @@ import {
   Post,
   Res,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { OffersService } from './offers.service';
-import { AddOfferResponse, OfferInterface } from '../../interfaces/offer';
+import { OfferInterface } from '../interfaces/offer';
 import { MulterDiskUploadedFiles } from '../interfaces/files';
 import { AddOfferDto } from './dto/dto';
 import { Offers } from './offers.entity';
 import * as path from 'path';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { multerStorage, storageDir } from '../utils/storage';
+import { AuthGuard } from '@nestjs/passport';
+import { UserObj } from '../decorators/user-obj.decorator';
+import { User } from '../user/user.entity';
 
 @Controller('offers')
 export class OffersController {
@@ -33,6 +37,7 @@ export class OffersController {
   }
 
   @Post('/add')
+  @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -46,9 +51,10 @@ export class OffersController {
   )
   addOffer(
     @Body() req: AddOfferDto,
+    @UserObj() user: User,
     @UploadedFiles() files: MulterDiskUploadedFiles,
   ): Promise<OfferInterface> {
-    return this.offersService.add(req, files);
+    return this.offersService.add(req, files, user);
   }
 
   @Get('/photo/:id')
