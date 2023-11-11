@@ -81,4 +81,9 @@ export class OffersService {
       throw e;
     }
   }
+
+  async buyOffer(id: string): Promise<Offers> {
+    const offer = await Offers.findOneBy({ id });
+    return await offer.remove();
+  }
 }

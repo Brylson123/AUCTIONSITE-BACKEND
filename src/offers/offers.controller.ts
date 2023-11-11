@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -57,6 +58,10 @@ export class OffersController {
     return this.offersService.add(req, files, user);
   }
 
+  @Delete('/buy/:id')
+  buyOffer(@Param('id') id: string): Promise<Offers> {
+    return this.offersService.buyOffer(id);
+  }
   @Get('/photo/:id')
   async getPhoto(@Param('id') id: string, @Res() res: any): Promise<any> {
     return this.offersService.getPhoto(id, res);
