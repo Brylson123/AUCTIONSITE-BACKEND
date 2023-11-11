@@ -25,6 +25,7 @@ export class AuthService {
       expiresIn,
     };
   }
+
   private async generateToken(user: User): Promise<string> {
     let token;
     let userWithThisToken = null;
@@ -36,6 +37,7 @@ export class AuthService {
     await user.save();
     return token;
   }
+
   async login(req: AuthLoginDto, res: Response): Promise<any> {
     try {
       const user = await User.findOneBy({
@@ -53,7 +55,21 @@ export class AuthService {
           domain: 'localhost',
           httpOnly: true,
         })
-        .json({ ok: true });
+        .json({ ok: true, name: user.email });
+    } catch (e) {
+      return res.json({ error: e.message });
+    }
+  }
+  async logout(user: User, res: Response): Promise<any> {
+    try {
+      user.currentTokenId = null;
+      await user.save();
+      res.clearCookie('jwt', {
+        secure: false,
+        domain: 'localhost',
+        httpOnly: true,
+      });
+      return res.json({ message: 'logout' });
     } catch (e) {
       return res.json({ error: e.message });
     }

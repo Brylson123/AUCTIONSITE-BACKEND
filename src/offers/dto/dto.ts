@@ -1,11 +1,19 @@
-import { IsNumber, IsString, Max, Min } from 'class-validator';
+import {
+  IsNumber,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 export class AddOfferDto {
   @IsString()
-  @Max(999)
+  @MinLength(1)
+  @MaxLength(999)
   description: string;
   @IsString()
-  @Max(99)
+  @MaxLength(99)
   name: string;
   @IsNumber()
   @Min(1)
